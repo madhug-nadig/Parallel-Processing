@@ -3,7 +3,7 @@ import math
 import os
 
 #----------------------------------------------------------------------------------------------------------------------
-#This is a VERY SIMPLE example of parallel processing in Python using the multiprocessing library using the Process function.
+#This is a VERY SIMPLE example of parallel processing in Python using the multiprocessing library using the Process object.
 #----------------------------------------------------------------------------------------------------------------------
 
 
