@@ -1,6 +1,6 @@
 #================================================================================================================
 #----------------------------------------------------------------------------------------------------------------
-#									K NEAREST NEIGHBOURS - IN PARALLEL
+#									K NEAREST NEIGHBOURS
 #----------------------------------------------------------------------------------------------------------------
 #================================================================================================================
 
@@ -15,7 +15,6 @@ from collections import Counter
 from sklearn import preprocessing
 from itertools import repeat
 
-
 #for plotting
 plt.style.use('ggplot')
 
@@ -26,45 +25,37 @@ class CustomKNN:
 		self.total_predictions = 0
 		self.accuracy = 0.0
 		
-	def distances_for_parallel(self, features, incoming, group):
-		return (np.linalg.norm(np.array(features)- np.array(incoming)), group)
+	def distances_for_parallel(self, features, incoming):
+		return np.linalg.norm(np.array(features)- np.array(incoming))
 
-	def predict(self, training_data, to_predict, group, k = 3):
-		#training_data = dict(item for item in training_data)  # Convert back to a dict
-		print(training_data)
-
+	def predict(self, training_data, to_predict, k = 3):
 		if len(training_data) >= k:
 			print("K cannot be smaller than the total voting groups(ie. number of training data points)")
 			return
 		
+		pool = mp.Pool(processes= mp.cpu_count())
+
 		distributions = []
 		for group in training_data:
 			for features in training_data[group]:
-				euclidean_distance = np.linalg.norm(np.array(features)- np.array(to_predict))
+				euclidean_distance = np.array([ pool.starmap(self.distances_for_parallel), zip(features, repeat(to_predict))])
 				distributions.append([euclidean_distance, group])
 		
-		results = [i[1] for i in sorted(distributions)[:k]]
-		result = Counter(results).most_common(1)[0][0]
-		confidence = Counter(results).most_common(1)[0][1]/k
+			results = [i[1] for i in sorted(distributions)[:k]]
+			result = Counter(results).most_common(1)[0][0]
+			confidence = Counter(results).most_common(1)[0][1]/k
 		
-		if result == group:
-			self.accurate_predictions += 1
-		
-		else:
-			print("Wrong classification with confidence " + str(confidence * 100) + " and class " + str(result))
-		
-		self.total_predictions += 1
-
+		return result, confidence
 	
-	def test(self, test_set, training_data):
-		pool = mp.Pool(processes= 8)
-
-		
+	def test(self, test_set, training_set):
 		for group in test_set:
-			training_data = list(training_data.items())
-			print(type(training_data))
-			pool.starmap(self.predict, zip(training_data, test_set[group], repeat(group), repeat(3)))
-		
+			for data in test_set[group]:
+				predicted_class,confidence = self.predict(training_set, data, k =3)
+				if predicted_class == group:
+					self.accurate_predictions += 1
+				else:
+					print("Wrong classification with confidence " + str(confidence * 100) + " and class " + str(predicted_class))
+				self.total_predictions += 1
 		self.accuracy = 100*(self.accurate_predictions/self.total_predictions)
 		print("\nAcurracy :", str(self.accuracy) + "%")
 
