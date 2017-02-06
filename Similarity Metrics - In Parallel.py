@@ -11,6 +11,8 @@ from math import pow, sqrt
 from decimal import Decimal
 import multiprocessing as mp
 import time
+from itertools import repeat
+
 
 class SimilarityMetric():
 	def __init__(self):
@@ -61,9 +63,25 @@ class SimilarityMetric():
 		root_value = 1/float(n_root)
 		return round (Decimal(value) ** Decimal(root_value),3)
 
+	#Serial Minkowski Distance
 	def serial_minkowski_distance(self, x,y,p_value):
 		return self.nth_root(sum(pow(abs(a-b),p_value) for a,b in zip(x, y)),p_value)
-
+	
+	#Parallel Minkowski Distance
+	
+	def minkowski_helper(self,a,b,p):
+			return pow(abs(a-b), p)
+	
+	def parallel_minkowski_distance(self, x,y,p_value):
+		pool = mp.Pool(processes= 32)
+		s = time.clock()
+		results = pool.starmap(self.minkowski_helper, zip(x,y,repeat(p_value)))
+		res = self.nth_root(sum(results), p_value)
+		e = time.clock()
+		print("Parallel Manhattan Exec Time: ", e-s)
+		return res	
+	
+	
 	
 	#COSINE SIMILARITY
 	
@@ -97,6 +115,17 @@ class SimilarityMetric():
 		print("Parallel Cosine Exec Time: ", e-s)
 		return round(numerator/float(denominator),3)
 
+	#JACCARD SIMILARITY
+	
+	#Serial Jaccard Similarity
+	def serial_jaccard_similarity(self, x,y):
+		intersection_cardinality = len(set.intersection(*[set(x), set(y)]))
+		union_cardinality = len(set.union(*[set(x), set(y)]))
+		return intersection_cardinality/float(union_cardinality)
+	
+	
+	
+	#Parallel Jaccard Similarity
 	def parallel_jaccard_similarity(self,x,y):
 
 		pool = mp.Pool(processes= 16)
@@ -104,10 +133,7 @@ class SimilarityMetric():
 		nums = pool.starmap(self.multplierr, zip(x,y))
 		numerator = sum(nums)
 		
-		#x_sqr = pool.starmap( self.multplierr, zip(x,x))
-		#y_sqr = pool.starmap( self.multplierr, zip(y,y))
 		
-		#denominator = round(sqrt(sum(x_sqr))) * round(sqrt(sum(y_sqr)))
 		denominator = self.square_rooted(x)*self.square_rooted(y)
 		
 		e = time.clock()
@@ -115,24 +141,26 @@ class SimilarityMetric():
 		return round(numerator/float(denominator),3)
 
 		
-	def serial_jaccard_similarity(self, x,y):
-		intersection_cardinality = len(set.intersection(*[set(x), set(y)]))
-		union_cardinality = len(set.union(*[set(x), set(y)]))
-		return intersection_cardinality/float(union_cardinality)
+	
 
 def main():
 	sm = SimilarityMetric()
 
 	# print("Jaccard Similarity: ", sm.serial_jaccard_similarity([3, 45, 7, 2], [2, 54, 13, 15]))
 	
-	s = time.clock()
-	print("Cosine similarity: ", sm.serial_cosine_similarity([x for x in range(0,30000000,3)], [x for x in range(0,20000000,2)]))
+	# s = time.clock()
+	# print("Cosine similarity: ", sm.serial_cosine_similarity([x for x in range(0,30000000,3)], [x for x in range(0,20000000,2)]))
+	# e = time.clock()
+	# print("Serial Cosine  Time: ", e-s)
+	# print("Parallel Cosine similarity: ", sm.parallel_cosine_similarity([x for x in range(0,30000000,3)], [x for x in range(0,20000000,2)]))
+
+
+	s = time.clock()	
+	print("Minkowski Distance: ", sm.serial_minkowski_distance([x for x in range(0,30000000,3)], [x for x in range(0,20000000,2)],3))
 	e = time.clock()
-	print("Serial Cosine  Time: ", e-s)
-	print("Parallel Cosine similarity: ", sm.parallel_cosine_similarity([x for x in range(0,30000000,3)], [x for x in range(0,20000000,2)]))
-	
-	# print("Minkowski Distance: ", sm.serial_minkowski_distance([3, 45, 7, 2], [2, 54, 13, 15],3))
-	
+	print("Serial Minkowski Distance  Time: ", e-s)
+	print("Parallel Minkowski Distance similarity: ", sm.parallel_minkowski_distance([x for x in range(0,30000000,3)], [x for x in range(0,20000000,2)], 3))
+
 	# s = time.clock()
 	# print("Manhattan Distance: ", sm.serial_manhattan_distance([x for x in range(0,30000000,3)], [x for x in range(0,20000000,2)]))
 	# e = time.clock()
