@@ -121,32 +121,51 @@ class SimilarityMetric():
 	def serial_jaccard_similarity(self, x,y):
 		intersection_cardinality = len(set.intersection(*[set(x), set(y)]))
 		union_cardinality = len(set.union(*[set(x), set(y)]))
+		print(intersection_cardinality, union_cardinality)
 		return intersection_cardinality/float(union_cardinality)
 	
 	
 	
+	def interc_card_locl(self, x,y):
+		return len(set.intersection(*[set(x), set(y)]))
+	
+	def union_card_locl(self,x,y):
+		return len(set.union(*[set(x), set(y)]))
+		
 	#Parallel Jaccard Similarity
 	def parallel_jaccard_similarity(self,x,y):
-
-		pool = mp.Pool(processes= 16)
+		
+		p = 16
+		pool = mp.Pool(processes= p)
+		
+		chunk_X = []
+		chunk_Y = []
+		
+		for i in range(0, len(x), p):
+		
+			chunk_X.append(x[int(i):int((i+1)*p)])
+			chunk_Y.append(y[int(i):int((i+1)*p)])
+		
 		s = time.clock()
-		nums = pool.starmap(self.multplierr, zip(x,y))
-		numerator = sum(nums)
 		
-		
-		denominator = self.square_rooted(x)*self.square_rooted(y)
-		
+		intersection_cardinality = sum(pool.starmap(self.interc_card_locl, zip(chunk_X,chunk_Y)))
+		union_cardinality = sum(pool.starmap(self.union_card_locl, zip(chunk_X,chunk_Y)))
+		print(intersection_cardinality, union_cardinality)
 		e = time.clock()
-		print("Parallel Cosine Exec Time: ", e-s)
-		return round(numerator/float(denominator),3)
+		print("Parallel Jaccard Exec Time: ", e-s)
+		return intersection_cardinality/float(union_cardinality)
 
 		
 	
 
 def main():
 	sm = SimilarityMetric()
-
-	# print("Jaccard Similarity: ", sm.serial_jaccard_similarity([3, 45, 7, 2], [2, 54, 13, 15]))
+	
+	s = time.clock()
+	print("Jaccard Similarity: ", sm.serial_jaccard_similarity([x for x in range(0,30000,3)], [x for x in range(0,20000,2)]))
+	e = time.clock()
+	print("Serial Jaccard  Time: ", e-s)
+	print("Parallel Jaccard similarity: ", sm.parallel_jaccard_similarity([x for x in range(0,30000,3)], [x for x in range(0,20000,2)]))
 	
 	# s = time.clock()
 	# print("Cosine similarity: ", sm.serial_cosine_similarity([x for x in range(0,30000000,3)], [x for x in range(0,20000000,2)]))
@@ -155,11 +174,11 @@ def main():
 	# print("Parallel Cosine similarity: ", sm.parallel_cosine_similarity([x for x in range(0,30000000,3)], [x for x in range(0,20000000,2)]))
 
 
-	s = time.clock()	
-	print("Minkowski Distance: ", sm.serial_minkowski_distance([x for x in range(0,30000000,3)], [x for x in range(0,20000000,2)],3))
-	e = time.clock()
-	print("Serial Minkowski Distance  Time: ", e-s)
-	print("Parallel Minkowski Distance similarity: ", sm.parallel_minkowski_distance([x for x in range(0,30000000,3)], [x for x in range(0,20000000,2)], 3))
+	# s = time.clock()	
+	# print("Minkowski Distance: ", sm.serial_minkowski_distance([x for x in range(0,30000000,3)], [x for x in range(0,20000000,2)],3))
+	# e = time.clock()
+	# print("Serial Minkowski Distance  Time: ", e-s)
+	# print("Parallel Minkowski Distance similarity: ", sm.parallel_minkowski_distance([x for x in range(0,30000000,3)], [x for x in range(0,20000000,2)], 3))
 
 	# s = time.clock()
 	# print("Manhattan Distance: ", sm.serial_manhattan_distance([x for x in range(0,30000000,3)], [x for x in range(0,20000000,2)]))
