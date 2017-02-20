@@ -6,6 +6,7 @@
 
 # The following code contains serial and parallelized versions of the top 5 similarity measures implemented in python. 
 # The serial code is from: http://dataconomy.com/2015/04/implementing-the-five-most-popular-similarity-measures-in-python/
+# Running all the algorithms one after another will have a negative imact of parallel performance due to cache related issues.
 
 from math import pow, sqrt
 from decimal import Decimal
@@ -161,39 +162,40 @@ class SimilarityMetric():
 def main():
 	sm = SimilarityMetric()
 	
+	# Jaccard Similarity
 	s = time.clock()
 	print("Jaccard Similarity: ", sm.serial_jaccard_similarity([x for x in range(0,30000,3)], [x for x in range(0,20000,2)]))
 	e = time.clock()
 	print("Serial Jaccard  Time: ", e-s)
 	print("Parallel Jaccard similarity: ", sm.parallel_jaccard_similarity([x for x in range(0,30000,3)], [x for x in range(0,20000,2)]))
 	
-	# s = time.clock()
-	# print("Cosine similarity: ", sm.serial_cosine_similarity([x for x in range(0,30000000,3)], [x for x in range(0,20000000,2)]))
-	# e = time.clock()
-	# print("Serial Cosine  Time: ", e-s)
-	# print("Parallel Cosine similarity: ", sm.parallel_cosine_similarity([x for x in range(0,30000000,3)], [x for x in range(0,20000000,2)]))
+	# Cosine Similarity
+	s = time.clock()
+	print("Cosine similarity: ", sm.serial_cosine_similarity([x for x in range(0,30000000,3)], [x for x in range(0,20000000,2)]))
+	e = time.clock()
+	print("Serial Cosine  Time: ", e-s)
+	print("Parallel Cosine similarity: ", sm.parallel_cosine_similarity([x for x in range(0,30000000,3)], [x for x in range(0,20000000,2)]))
 
+	# Minkowski Distance
+	s = time.clock()	
+	print("Minkowski Distance: ", sm.serial_minkowski_distance([x for x in range(0,30000000,3)], [x for x in range(0,20000000,2)],3))
+	e = time.clock()
+	print("Serial Minkowski Distance  Time: ", e-s)
+	print("Parallel Minkowski Distance similarity: ", sm.parallel_minkowski_distance([x for x in range(0,30000000,3)], [x for x in range(0,20000000,2)], 3))
 
-	# s = time.clock()	
-	# print("Minkowski Distance: ", sm.serial_minkowski_distance([x for x in range(0,30000000,3)], [x for x in range(0,20000000,2)],3))
-	# e = time.clock()
-	# print("Serial Minkowski Distance  Time: ", e-s)
-	# print("Parallel Minkowski Distance similarity: ", sm.parallel_minkowski_distance([x for x in range(0,30000000,3)], [x for x in range(0,20000000,2)], 3))
-
-	# s = time.clock()
-	# print("Manhattan Distance: ", sm.serial_manhattan_distance([x for x in range(0,30000000,3)], [x for x in range(0,20000000,2)]))
-	# e = time.clock()
-	# print("Serial Manhattan  Time: ", e-s)
-	# print("Parallel Manhattan Distance: ", sm.parallel_manhattan_distance([x for x in range(0,30000000,3)], [x for x in range(0,20000000,2)]))
+	# Manhattan Distance
+	s = time.clock()
+	print("Manhattan Distance: ", sm.serial_manhattan_distance([x for x in range(0,30000000,3)], [x for x in range(0,20000000,2)]))
+	e = time.clock()
+	print("Serial Manhattan  Time: ", e-s)
+	print("Parallel Manhattan Distance: ", sm.parallel_manhattan_distance([x for x in range(0,30000000,3)], [x for x in range(0,20000000,2)]))
 	
-	#time.sleep(1)
-	#print("Sleepin' \n")
-	
-	#s = time.clock()
-	#print("Euclidean Distance: ", sm.serial_euclidean_distance([x for x in range(0,30000000,3)], [x for x in range(0,20000000,2)]))
-	#e = time.clock()
-	#print("Serial Euclidean  Time: ", e-s)
-	#print("Parallel Euclidean Distance: ", sm.parallel_euclidean_distance([x for x in range(0,30000000,3)], [x for x in range(0,20000000,2)]))
+	# Euclidean Distance
+	s = time.clock()
+	print("Euclidean Distance: ", sm.serial_euclidean_distance([x for x in range(0,30000000,3)], [x for x in range(0,20000000,2)]))
+	e = time.clock()
+	print("Serial Euclidean  Time: ", e-s)
+	print("Parallel Euclidean Distance: ", sm.parallel_euclidean_distance([x for x in range(0,30000000,3)], [x for x in range(0,20000000,2)]))
 
 
 if __name__ == '__main__':
