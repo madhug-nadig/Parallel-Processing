@@ -6,6 +6,9 @@
 clock_t t, end;
 double cpu_time_used;
 
+struct Compare { int val; int index; };
+#pragma omp declare reduction(maximum : struct Compare : omp_out = omp_in.val > omp_out.val ? omp_in : omp_out)
+
 
 void swap(int* a, int* b);
 void selectionSort(int* A, int n);
@@ -44,15 +47,19 @@ int main(){
 void selectionSort(int* A, int n){
 	
 	for(int startpos =0; startpos < n; startpos++){
-		int minpos = startpos;
-		#pragma omp parallel for
+		struct Compare max;
+        max.val = A[startpos];
+        max.index = startpos;
+
+        #pragma omp parallel for reduction(maximum:max)
 		for(int i=startpos +1; i< n; ++i){
-			if(A[i] < A[minpos]){
-				minpos = i;
+			if(A[i] > max.val){
+				max.val = A[i];
+				max.index = i;
 			}
 		}
 
-		swap(&A[startpos], &A[minpos]);
+		swap(&A[startpos], &A[max.index]);
 	}
 }
 
@@ -60,7 +67,7 @@ void selectionSort(int* A, int n){
 void verify(int* A, int n){
 	int failcount = 0;
 	for(int iter = 0; iter < n-1; iter++){
-		if(A[iter] > A[iter+1]){
+		if(A[iter] < A[iter+1]){
 			//printf("\nSort fail\n");
 			failcount++;
 			//printf("%d and %d", A[iter], A[iter+1]);
