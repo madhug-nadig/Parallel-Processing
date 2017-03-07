@@ -3,10 +3,17 @@
 #include <time.h>
 #include "omp.h"
 
+/*
+OpenMP implementation example
+Details of implementation/tutorial can be found here: http://madhugnadig.com/articles/parallel-processing/2017/02/25/parallel-computing-in-c-using-openMP.html
+*/
+
 clock_t t, end;
 double cpu_time_used;
 
+// Structure for enabling reduction on the index of elements
 struct Compare { int val; int index; };
+// Custom reduction for finding hte index of the max element.
 #pragma omp declare reduction(maximum : struct Compare : omp_out = omp_in.val > omp_out.val ? omp_in : omp_out)
 
 
@@ -37,6 +44,7 @@ int main(){
 
 	cpu_time_used = ((double)t)/CLOCKS_PER_SEC;
 	
+	// Verify if the algorithm works as advised
 	verify(Arr, number);
 
 	printf("\nTime taken for sort: %f", cpu_time_used);
@@ -47,10 +55,13 @@ int main(){
 void selectionSort(int* A, int n){
 	
 	for(int startpos =0; startpos < n; startpos++){
+		// Declare the structure required for reduction
 		struct Compare max;
+        // Initialize the variables
         max.val = A[startpos];
         max.index = startpos;
 
+        // Parallel for loop with custom reduction, at the end of the loop, max will have the max element and its index.
         #pragma omp parallel for reduction(maximum:max)
 		for(int i=startpos +1; i< n; ++i){
 			if(A[i] > max.val){
@@ -63,21 +74,18 @@ void selectionSort(int* A, int n){
 	}
 }
 
-
+// Verification function
 void verify(int* A, int n){
 	int failcount = 0;
 	for(int iter = 0; iter < n-1; iter++){
 		if(A[iter] < A[iter+1]){
-			//printf("\nSort fail\n");
 			failcount++;
-			//printf("%d and %d", A[iter], A[iter+1]);
 		}
-		//printf("\nSort success\n");
 	}
 	printf("\nFail count: %d\n", failcount);
-
 }
 
+//Swap function
 void swap(int* a, int* b){
 	int temp = *a;
 	*a = *b;
