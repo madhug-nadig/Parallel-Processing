@@ -5,6 +5,7 @@ import time
 
 #----------------------------------------------------------------------------------------------------------------------
 #This is a VERY SIMPLE example of parallel processing in Python using the multiprocessing library using the Pools object.
+# Details of implementation/tutorial can be found here: http://madhugnadig.com/articles/parallel-processing/2017/01/25/parallel-programming-in-python-with-ease.html
 #----------------------------------------------------------------------------------------------------------------------
 
 
