@@ -15,10 +15,10 @@ This repository contains both parallelized algorithms and tutorials/examples of 
 ## Implementations | Examples | Tutorials:
 
 #### Parallel Computing in Python using Multiprocessing library
-     * Using Multiprocessing Pools
-     * Using Multiprocessing Processes
+   * Using Multiprocessing Pools
+   * Using Multiprocessing Processes
     
 #### Parallel Computing in C using OpenMP
-     * Linear Search
-     * Selection Sort
-     * Merge Sort
+   * Linear Search
+   * Selection Sort
+   * Merge Sort
