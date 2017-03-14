@@ -1,21 +1,23 @@
 #include <stdio.h>
 #include <stdlib.h>
- 
+
+#include "omp.h"
+
 void mergesort(int a[],int i,int j);
 void merge(int a[],int i1,int j1,int i2,int j2);
- 
+
 int main()
 {
     int *a, num, i;
     scanf("%d",&num);
 
-   a = (int *)malloc(sizeof(int) * num);    
+   a = (int *)malloc(sizeof(int) * num);
     for(i=0;i<num;i++)
         scanf("%d",&a[i]);
         
     mergesort(a, 0, num-1);
     
-    printf("\nSorted array :");
+    printf("\nSorted array :\n");
     for(i=0;i<num;i++)
         printf("%d ",a[i]);
         
@@ -33,26 +35,24 @@ void mergesort(int a[],int i,int j)
         #pragma omp parallel sections 
         {
 
-            #pragma omp parallel section
+            #pragma omp section
             {
                 mergesort(a,i,mid);        //left recursion
             }
 
-            #pragma omp parallel section
+            #pragma omp section
             {
                 mergesort(a,mid+1,j);    //right recursion
             }
         }
 
-
         merge(a,i,mid,mid+1,j);    //merging of two sorted sub-arrays
-
     }
 }
  
 void merge(int a[],int i1,int j1,int i2,int j2)
 {
-    int temp[50];    //array used for merging
+    int temp[1000];    //array used for merging
     int i,j,k;
     i=i1;    //beginning of the first list
     j=i2;    //beginning of the second list
