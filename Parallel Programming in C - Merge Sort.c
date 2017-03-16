@@ -3,6 +3,11 @@
 
 #include "omp.h"
 
+/*
+OpenMP implementation example
+Details of implementation/tutorial can be found here: http://madhugnadig.com/articles/parallel-processing/2017/02/25/parallel-computing-in-c-using-openMP.html
+*/
+
 void mergesort(int a[],int i,int j);
 void merge(int a[],int i1,int j1,int i2,int j2);
 
