@@ -18,9 +18,9 @@ from itertools import repeat
 class SimilarityMetric():
 	def __init__(self):
 		pass
-	
+
 	# EUCLIDEAN DISTANCE
-	
+
 	#serial euclidean distance
 	def serial_euclidean_distance(self,x,y):
 		return sqrt(sum(pow(a-b,2) for a, b in zip(x, y)))
@@ -37,17 +37,17 @@ class SimilarityMetric():
 		e = time.clock()
 		print("Parallel Euclidean Exec: ", e-s)
 		return res
-	
-	
+
+
 	# MANHATTAN DISTANCE
-	
-	#serial manhattan distance	
+
+	#serial manhattan distance
 	def serial_manhattan_distance(self,x,y):
 		return sum(abs(a-b) for a,b in zip(x,y))
 
 	def sub(self, a, b):
 		return abs(a-b)
-	
+
 	#serial manhattan distance
 	def parallel_manhattan_distance(self,x,y):
 		pool = mp.Pool(processes= 32)
@@ -125,8 +125,8 @@ class SimilarityMetric():
 		print(intersection_cardinality, union_cardinality)
 		return intersection_cardinality/float(union_cardinality)
 	
-	
-	
+
+
 	def interc_card_locl(self, x,y):
 		return len(set.intersection(*[set(x), set(y)]))
 	
@@ -135,29 +135,26 @@ class SimilarityMetric():
 		
 	#Parallel Jaccard Similarity
 	def parallel_jaccard_similarity(self,x,y):
-		
+
 		p = 16
 		pool = mp.Pool(processes= p)
-		
+
 		chunk_X = []
 		chunk_Y = []
-		
+
 		for i in range(0, len(x), p):
-		
+
 			chunk_X.append(x[int(i):int((i+1)*p)])
 			chunk_Y.append(y[int(i):int((i+1)*p)])
-		
+
 		s = time.clock()
-		
+
 		intersection_cardinality = sum(pool.starmap(self.interc_card_locl, zip(chunk_X,chunk_Y)))
 		union_cardinality = sum(pool.starmap(self.union_card_locl, zip(chunk_X,chunk_Y)))
 		print(intersection_cardinality, union_cardinality)
 		e = time.clock()
 		print("Parallel Jaccard Exec Time: ", e-s)
 		return intersection_cardinality/float(union_cardinality)
-
-		
-	
 
 def main():
 	sm = SimilarityMetric()
@@ -177,7 +174,7 @@ def main():
 	print("Parallel Cosine similarity: ", sm.parallel_cosine_similarity([x for x in range(0,30000000,3)], [x for x in range(0,20000000,2)]))
 
 	# Minkowski Distance
-	s = time.clock()	
+	s = time.clock()
 	print("Minkowski Distance: ", sm.serial_minkowski_distance([x for x in range(0,30000000,3)], [x for x in range(0,20000000,2)],3))
 	e = time.clock()
 	print("Serial Minkowski Distance  Time: ", e-s)
