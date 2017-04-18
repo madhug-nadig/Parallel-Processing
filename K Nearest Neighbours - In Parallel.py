@@ -37,10 +37,12 @@ class CustomKNN:
 		distributions = []
 		for group in training_data:
 			for features in training_data[group]:
+				# Find euclidean distance using the numpy function
 				euclidean_distance = np.linalg.norm(np.array(features)- np.array(to_predict))
 				distributions.append([euclidean_distance, group])
-		
+		# Find the k nearest neighbors
 		results = [i[1] for i in sorted(distributions)[:k]]
+		# Figure out which is the most common class amongst the neighbors.
 		result = Counter(results).most_common(1)[0][0]
 		confidence = Counter(results).most_common(1)[0][1]/k
 		
@@ -51,11 +53,18 @@ class CustomKNN:
 
 		arr = {}
 		s = time.clock()
+		
+		# Where the magic happens, this is where we parallelize our code. While testing for the classes of incoming points,
+		# we divide the incoming data points and feed them into the predict funtion in parallel.
+		# I have used the starpmap function of multiprocessing library for this purpose. 
+		# The training data gets repeated to get an iterable of the training dataset for the map function, ie. the predict funtion, to be applied on.
 		for group in test_set:
 			arr[group] =  pool.starmap(self.predict, zip(repeat(training_set), test_set[group], repeat(3)))
 		e = time.clock()
 
-		#Calculating Accuracy
+		#Calculating Accuracy - The accuracy code has to be modified due to the induced parallelism. 
+		# It is no longer possible to determinstically calculate the accurate predictions where multiple subprocesses are doing the same increment.
+
 		for group in test_set:
 			for data in test_set[group]:
 				for i in arr[group]:
