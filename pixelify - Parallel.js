@@ -69,23 +69,28 @@
               this._canvasClean.height= this._canvas.height;
           }
 
-
+          // Spin up a new worker
           var worker = new Worker("pix.js");
           
           var canvas = document.createElement('canvas');
 
           worker.postMessage([this.h , this.pixel, this.w, this.x, this.y, hs, data, this.alpha]); // Sending message as an array to the worker
+          // Create a copy for the onmessage handler
           var pxo = this;
+
+          // Wait for the message from the worker
           worker.onmessage = function(e) {
                 console.log(pxo._context)
-
+                // Another nested for loop to apply results
                 for (y = 0; y <= pxo.h + hs; y += pxo.pixel) {
                     for (x = 0; x <= pxo.w + hs; x += pxo.pixel) {
+                        // Apply the results through the pxo object
                         pxo[this.clean ? '_contextClean' : '_context'].fillStyle = e.data.rgbas[y/10][x/10];
                         pxo[this.clean ? '_contextClean' : '_context']
                             .fillRect( (pxo.x + x) - hs, (pxo.y + y) - hs, pxo.pixel, pxo.pixel )
                     }
                 }
+                // replace the original iamge with pixellated image
                 pxo.replace();
             };
 
