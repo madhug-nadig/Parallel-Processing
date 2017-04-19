@@ -14,6 +14,11 @@
 		}
 	}
 
+	array= []
+	for(i =12800; i > 0; i--){
+		array.push(Math.round(Math.random()*1000));
+	}
+
 	a = performance.now();
 	bothsort();
 	b = performance.now();
@@ -33,10 +38,7 @@
 			var worker = new Worker("mergesort.js");
 			var worker_2 = new Worker("quicksort.js");
 
-			array= []
-			for(i =1000; i > 0; i--){
-				array.push(i);
-			}
+			
 			worker.postMessage(array); // Sending message as an array to the worker
 			worker_2.postMessage(array); // Sending message as an array to the worker
 
