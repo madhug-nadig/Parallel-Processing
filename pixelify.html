@@ -1,0 +1,29 @@
+<html>
+	<head>
+		<title>Parallel JS using Web Workers</title>
+	</head>
+	<body>
+		<img src = "data/Z1.jpg" id= "z"></img>
+	</body>
+	<script type="text/javascript" src = "pixelify - Parallel.js">
+	</script>
+	<script>
+		var image, options;
+
+		image = document.getElementsByTagName('img')[0];
+
+		options = {
+			pixel	: 10,
+			x 		: 0,
+			y 		: 0,
+			w 		: image.width,
+			h 		: image.height,
+			alpha : 1,
+			clean : false
+		};
+		a = performance.now();
+		new Pixelify(image, options);
+		b = performance.now();
+		alert(b-a)
+	</script>
+</html>
