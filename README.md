@@ -22,3 +22,8 @@ This repository contains both parallelized algorithms and tutorials/examples of 
    * Linear Search
    * Selection Sort
    * Merge Sort
+#### Parallel Computing in JavScript using Web Workers
+   * THree Hump Camel Function
+   * Task Parallelism: Quicksort and Mergesort
+   * Pixel Manipulation
+
